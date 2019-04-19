@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MyPhoneHelper</string>
+    <string name="action_settings">Settings</string>
+    <string name="accessibility_description">我是滑动返回助手,专门解决那些恶心的物理返回键或者虚拟键的</string>
+</resources>
