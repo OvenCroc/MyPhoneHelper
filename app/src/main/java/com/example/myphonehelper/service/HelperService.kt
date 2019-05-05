@@ -11,8 +11,8 @@ import android.view.accessibility.AccessibilityEvent
 import com.example.myphonehelper.R
 import com.example.myphonehelper.activity.toast
 import com.example.myphonehelper.callback.GestureCallBack
-import kotlinx.android.synthetic.main.slide_view_layout.view.*
 import kotlinx.android.synthetic.main.slide_bottom_view_layout.view.*
+import kotlinx.android.synthetic.main.slide_view_layout.view.*
 
 
 /**
@@ -22,13 +22,24 @@ import kotlinx.android.synthetic.main.slide_bottom_view_layout.view.*
 class HelperService : AccessibilityService(), View.OnTouchListener {
     var windowManager: WindowManager? = null
     var gestureCallBack: GestureCallBack = object : GestureCallBack {
-        override fun onVerticalFlipCallback() {
-            doGoHome()
-        }
-
         override fun onHorizenFlipCallback() {
             doFinishActivity()
         }
+
+        override fun onVerticalFlipCallback(isTopToBottom: Boolean) {
+            if (isTopToBottom) {
+                doGoHome()
+            } else {
+                doShowCurrentApp()
+            }
+        }
+
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
+    private fun doShowCurrentApp() {
+        this.performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS)
     }
 
     /**
@@ -98,6 +109,7 @@ class HelperService : AccessibilityService(), View.OnTouchListener {
             MotionEvent.ACTION_MOVE -> {//手指开始移动
                 val moveX = Math.abs(event.x - startX)
                 val moveY = Math.abs(event.y - startY)
+                val isHome = event.y > startY //上滑
                 if (moveX > moveY) {//当前横向滑动的距离比较大
                     Log.i("zp", "横向移动")
                     scrollType = 0
@@ -110,7 +122,7 @@ class HelperService : AccessibilityService(), View.OnTouchListener {
                 if (scrollType == 0) {
                     gestureCallBack?.onHorizenFlipCallback()
                 } else {
-                    gestureCallBack?.onVerticalFlipCallback()
+                    gestureCallBack?.onVerticalFlipCallback(event.y > startY)
                 }
                 startX = 0f
                 startY = 0f
@@ -144,7 +156,7 @@ class HelperService : AccessibilityService(), View.OnTouchListener {
         var bottomParam = initLayoutParam(Gravity.BOTTOM)
         windowManager?.addView(leftView, leftParam)
         windowManager?.addView(rightView, rightParam)
-        windowManager?.addView(bottomView, bottomParam)
+//        windowManager?.addView(bottomView, bottomParam)
     }
 
     private fun createAddView(type: Int): View? {
@@ -212,6 +224,5 @@ class HelperService : AccessibilityService(), View.OnTouchListener {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        Log.i("zp", "event $event")
     }
 }

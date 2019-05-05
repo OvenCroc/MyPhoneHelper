@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
      * 跳转系统辅助功能设置界面请求码
      */
     private val ACCESSIBILITY_REQUEST_CODE: Int = 8888
+    private var isFirstIn = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +37,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         getPermissionTv.setOnClickListener(this)
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (isFirstIn) {//每次都要去点按钮，麻烦，直接进来就请求权限不行么
+            getPermission()
+            isFirstIn = false
+        }
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
@@ -74,12 +82,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 finish()
             } else {
                 //跳转开启辅助权限界面
-                toast("请打开辅助功能权限")
+                toast("来！请打开辅助功能权限")
                 gotoOpenAccessibility()
             }
         } else {
             //跳转开启悬浮窗权限界面
-            toast("请打开悬浮窗权限")
+            toast("来！请打开悬浮窗权限")
             gotoOpenDrawOnOtherAppPermission()
         }
     }
